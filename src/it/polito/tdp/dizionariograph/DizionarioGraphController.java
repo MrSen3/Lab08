@@ -1,8 +1,7 @@
 package it.polito.tdp.dizionariograph;
 
 import java.net.URL;
-import java.util.ResourceBundle;
-
+import java.util.*;
 import it.polito.tdp.dizionariograph.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,18 +29,35 @@ public class DizionarioGraphController {
 
     @FXML
     void doGeneraGrafo(ActionEvent event) {
-
+    	//Leggo il valore inserito nella prima casella di testo
+    	int numeroLettere=Integer.parseInt(txtNumeroLettere.getText());
+    	
+    	//Ora devo chiamare il model affinche' generi il grafo non orientato
+    	model.createGraph(numeroLettere);
     }
 
+    @FXML
+    void doTrovaVicini(ActionEvent event) {
+    	List<String> figli= new ArrayList<String>();
+    	//Il grafo deve essere gia' creato
+    	
+    	//Leggo la parola inserita
+    	String parolaInserita = txtParolaDaCercare.getText();
+    	
+    	//Chiamo il model affinche' trovi i figli della parola inserita e me li salvi in una lista
+    	txtResult.setText("Le parole che differiscono per una sola lettera da "+parolaInserita.toUpperCase()+ " sono:\n");
+    	figli = model.displayNeighbours(parolaInserita);
+    	for(String s: figli) {
+    		txtResult.setText(s+ "\n");
+    	}
+    }
+    
     @FXML
     void doTrovaGradoMax(ActionEvent event) {
 
     }
 
-    @FXML
-    void doTrovaVicini(ActionEvent event) {
 
-    }
 
     @FXML
     void doReset(ActionEvent event) {
