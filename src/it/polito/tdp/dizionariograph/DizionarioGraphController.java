@@ -112,10 +112,22 @@ public class DizionarioGraphController {
     
     @FXML
     void doTrovaGradoMax(ActionEvent event) {
+    	//Pulisco la casella di testo così vedo il risultato
+    	txtResult.clear();
+
     	
+		int grado = model.findMaxDegree();
+		txtResult.appendText("Il grado massimo del grafo è: "+model.getParolaGradoMax()+", di grado "+grado+ " e i suoi vicini sono:\n" +ListToString(model.displayNeighbours(model.getParolaGradoMax())));
+
     }
 
-
+    String ListToString(List<String> figli) {
+    	String result="";
+    	for(String s: figli) {
+    		result+=s+ "\n";
+    	}
+    	return result;
+    }
 
     @FXML
     void doReset(ActionEvent event) {

@@ -15,66 +15,14 @@ import org.jgrapht.traverse.GraphIterator;
 import it.polito.tdp.dizionariograph.db.WordDAO;
 
 public class Model {
-	
-	private class EdgeTraversedGraphListener implements TraversalListener<String, DefaultEdge> {
 
-		@Override
-		public void connectedComponentFinished(ConnectedComponentTraversalEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void connectedComponentStarted(ConnectedComponentTraversalEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void edgeTraversed(EdgeTraversalEvent<DefaultEdge> ev) {
-			// TODO Auto-generated method stub
-			//Ogni volta che ha visitato un arco, deve capire se il nodo figlio visitato e' nuovo o no.
-			//Se e' la prima volta che viene visitato allora viene salvato nella mappa back con chiva=nodo figlio e argomento nodo padre
-			//back e' una mappa che punta dal basso vero l'alto (child->parent)
-			//per un nuovo vertice 'child' scoperto devo avere che:
-			// - child e' ancora conosciuto(non ancora trovato)
-			// - parent gia' visitato
-			
-			String sourceVertex = grafo.getEdgeSource(ev.getEdge());
-			String targetVertex = grafo.getEdgeTarget(ev.getEdge());
-
-			/*
-			 * se il grafo e' orientato allora source=parent, target==child
-			 * se non e' orientato, potrebbe essere al contrario
-			 */
-			
-			//se questo target non e' ancora una chiave della mappa e intanto il source e' gia' nella mappa(vuol dire che so da dove proviene)
-			if(!backVisit.containsKey(targetVertex) && backVisit.containsValue(sourceVertex)) {
-				backVisit.put(targetVertex, sourceVertex);
-			} else if(!backVisit.containsKey(sourceVertex) && backVisit.containsValue(targetVertex)){//questo serve solo nel caso di grafi non orientati
-				backVisit.put(sourceVertex, targetVertex);
-			}
-						
-		}
-
-		@Override
-		public void vertexFinished(VertexTraversalEvent<String> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void vertexTraversed(VertexTraversalEvent<String> arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-	
-		
-	}
 	private Graph <String, DefaultEdge> grafo;
 	private List<String> parole;
 //	private Map<Integer, String> wordIdMap;
 	private Map<String, String> backVisit;//albero all'indietro relativo alla visita
+	private int gradoMax;
+	private String parolaGradoMax;
+
 	
 	
 	public void createGraph(int numeroLettere) {
@@ -86,7 +34,7 @@ public class Model {
 		parole=new ArrayList<String>(dao.getAllWordsFixedLength(numeroLettere));
 		
 		if (parole.size() == 0) {
-			System.out.println("Nessuna parola trovata");
+			System.out.println("Nessuna parola della lunghezza indicata è presente nel db");
 			return;
 }
 		//Qui aggiungo al grafo creato in precedenza le parole della lunghezza specificata
@@ -116,7 +64,7 @@ public class Model {
 	//Per fare questo serve la lezione 26
 	public List<String> displayNeighbours(String parolaInserita) {
 		List<String> result = new ArrayList<String>();
-		if (!parole.contains(parolaInserita)) {
+		if (!grafo.containsVertex(parolaInserita)) {
 			return result;
 		}
 		result=Graphs.neighborListOf(this.grafo, parolaInserita);
@@ -140,8 +88,17 @@ public class Model {
 	}
 
 	public int findMaxDegree() {
+		gradoMax=Integer.MIN_VALUE;
+		for(String s: grafo.vertexSet()) {//guardo ogni vertice del grafo e se tale vertice ha un grado, maggiore del gradoMax che avevo prima lo salvo al suo interno altrimenti vado al vertice successivo
+			if(grafo.degreeOf(s)>gradoMax){
+				gradoMax = grafo.degreeOf(s);
+				parolaGradoMax = s;
+				System.out.println(parolaGradoMax+" "+gradoMax);
+			}
+		}
+		
 		System.err.println("findMaxDegree -- TODO");
-		return -1;
+		return gradoMax;
 	}
 	
 	
@@ -173,6 +130,16 @@ public class Model {
 
 	public List<String> getParole() {
 		return parole;
+	}
+
+
+	public int getGradoMax() {
+		return gradoMax;
+	}
+
+
+	public String getParolaGradoMax() {
+		return parolaGradoMax;
 	}
 	
 	
